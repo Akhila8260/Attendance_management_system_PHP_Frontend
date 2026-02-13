@@ -18,13 +18,15 @@ const ViewAttendance = () => {
 
   const fetchInitialData = async () => {
     try {
-      const classRes = await api.get("/admin/classes");
-      const subjectRes = await api.get("/teacher/subjects");
+      // ✅ Changed to teacher routes (NOT admin)
+      const classRes = await api.get("/teacher/classes");
+      const subjectRes = await api.get("/teacher/subjects-list");
 
       setClasses(classRes.data);
       setSubjects(subjectRes.data);
     } catch (error) {
       console.error(error);
+      Swal.fire("Error", "Failed to load classes or subjects", "error");
     }
   };
 
@@ -122,7 +124,7 @@ const ViewAttendance = () => {
             <tbody>
               {records.map((r) => (
                 <tr key={r.id}>
-                  <td className="border p-2">{r.student.roll_no}</td>
+                  <td className="border p-2">{r.student.student_id}</td>
                   <td className="border p-2">{r.student.name}</td>
                   <td
                     className={`border p-2 text-center font-semibold ${

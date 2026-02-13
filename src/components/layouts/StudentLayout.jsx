@@ -8,7 +8,7 @@ const StudentLayout = () => {
     { label: "Profile", path: "/student/profile" },
     { label: "Attendance", path: "/student/attendance" },
     { label: "Leaves", path: "/student/leaves" },
-    { label: "Timetable", path: "/student/timetable" },
+    // { label: "Timetable", path: "/student/timetable" },
     { label: "Notices", path: "/student/notices" },
   ];
 

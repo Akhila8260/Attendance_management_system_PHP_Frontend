@@ -12,6 +12,12 @@ const ResetPassword = () => {
     password: "",
     confirmPassword: "",
   });
+  const role = user.role.toLowerCase();
+
+  const endpoint =
+    role === "teacher"
+      ? "/teacher/reset-password"
+      : "/student/reset-password";
 
   const [loading, setLoading] = useState(false);
 
@@ -48,8 +54,9 @@ const ResetPassword = () => {
     try {
       setLoading(true);
 
-      await api.post("/teacher/reset-password", {
+      await api.post(endpoint, {
         password: form.password,
+        password_confirmation: form.confirmPassword,
       });
 
       toast.success("Password updated successfully");
@@ -75,7 +82,7 @@ const ResetPassword = () => {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          "Something went wrong"
+        "Something went wrong"
       );
     } finally {
       setLoading(false);

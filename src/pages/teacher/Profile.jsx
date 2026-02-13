@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 import Swal from "sweetalert2";
 
 const TeacherProfile = () => {
   const [profile, setProfile] = useState({});
   const [photoFile, setPhotoFile] = useState(null);
+  const navigate = useNavigate();
+
 
   const token = localStorage.getItem("token");
 
@@ -237,6 +241,18 @@ const TeacherProfile = () => {
               >
                 Save Changes
               </button>
+              <div className="md:col-span-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/reset-password", { state: { role: "teacher" } })
+                  }
+                  className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-md transition"
+                >
+                  Reset Password
+                </button>
+              </div>
+
             </div>
 
           </form>

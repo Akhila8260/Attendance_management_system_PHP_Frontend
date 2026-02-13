@@ -34,6 +34,8 @@ import StudentDashboard from "../pages/student/Dashboard";
 import StudentProfile from "../pages/student/Profile";
 import StudentAttendance from "../pages/student/Attendance";
 import StudentLeaves from "../pages/student/Leaves";
+import StudentNotices from "../pages/student/Notices";
+
 
 /* Guards */
 import AdminRoute from "../guards/AdminRoute";
@@ -58,7 +60,7 @@ const AppRoutes = () => {
           <Route path="classes" element={<Classes />} />
           <Route path="subjects" element={<Subjects />} />
           <Route path="notices" element={<AdminNotices />} /> {/* ✅ */}
-          <Route path="reports" element={<Reports />} />
+          {/* <Route path="reports" element={<Reports />} /> */}
           <Route path="leave-applications" element={<LeaveApplications />} />
           <Route path="today-attendance" element={<TodayAttendance />} />
         </Route>
@@ -76,7 +78,7 @@ const AppRoutes = () => {
           <Route path="attendance/view" element={<ViewAttendance />} />
 
           <Route path="leaves" element={<TeacherLeaves />} />
-          <Route path="timetable" element={<Timetable />} />
+          {/* <Route path="timetable" element={<Timetable />} /> */}
           <Route path="notices" element={<TeacherNotices />} /> {/* ✅ */}
         </Route>
       </Route>
@@ -88,7 +90,9 @@ const AppRoutes = () => {
           <Route path="profile" element={<StudentProfile />} />
           <Route path="attendance" element={<StudentAttendance />} />
           <Route path="leaves" element={<StudentLeaves />} />
-          <Route path="timetable" element={<Timetable />} />
+          {/* <Route path="timetable" element={<Timetable />} /> */}
+          <Route path="notices" element={<StudentNotices />} />
+
         </Route>
       </Route>
 

@@ -12,38 +12,27 @@ const TakeAttendance = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load Classes & Subjects
+  // ✅ Load Classes & Subjects on Mount
   useEffect(() => {
     fetchInitialData();
   }, []);
 
   const fetchInitialData = async () => {
     try {
-      const fetchInitialData = async () => {
-        try {
-          const res = await api.get("/teacher/subjects");
+      const [classRes, subjectRes] = await Promise.all([
+        api.get("/teacher/classes"),
+        api.get("/teacher/subjects-list"),
+      ]);
 
-          setSubjects(res.data);
-
-          // Extract unique classes from assigned subjects
-          const uniqueClasses = [
-            ...new Map(
-              res.data.map(item => [item.class_id, item])
-            ).values()
-          ];
-
-          setClasses(uniqueClasses);
-
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
+      setClasses(classRes.data);
+      setSubjects(subjectRes.data);
     } catch (error) {
       console.error(error);
+      Swal.fire("Error", "Failed to load initial data", "error");
     }
   };
 
+  // ✅ Fetch Students
   const fetchStudents = async () => {
     if (!classId || !section) {
       Swal.fire("Error", "Please select class & section", "error");
@@ -57,12 +46,12 @@ const TakeAttendance = () => {
         params: { class_id: classId, section },
       });
 
-      const formatted = res.data.map((s) => ({
-        ...s,
-        present: true,
+      const formattedStudents = res.data.map((student) => ({
+        ...student,
+        present: true, // default present
       }));
 
-      setStudents(formatted);
+      setStudents(formattedStudents);
     } catch (error) {
       Swal.fire("Error", "Failed to fetch students", "error");
     } finally {
@@ -70,17 +59,26 @@ const TakeAttendance = () => {
     }
   };
 
+  // ✅ Toggle Attendance
   const toggleAttendance = (id) => {
     setStudents((prev) =>
-      prev.map((s) =>
-        s.id === id ? { ...s, present: !s.present } : s
+      prev.map((student) =>
+        student.id === id
+          ? { ...student, present: !student.present }
+          : student
       )
     );
   };
 
+  // ✅ Submit Attendance
   const submitAttendance = async () => {
-    if (!subjectId || !date || students.length === 0) {
+    if (!classId || !section || !subjectId || !date) {
       Swal.fire("Error", "Complete all fields", "error");
+      return;
+    }
+
+    if (students.length === 0) {
+      Swal.fire("Error", "No students found", "error");
       return;
     }
 
@@ -95,8 +93,11 @@ const TakeAttendance = () => {
         students,
       });
 
-      Swal.fire("Success", "Attendance Marked", "success");
+      Swal.fire("Success", "Attendance marked successfully", "success");
+
       setStudents([]);
+      setSubjectId("");
+      setDate("");
     } catch (error) {
       Swal.fire(
         "Error",
@@ -112,21 +113,24 @@ const TakeAttendance = () => {
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-bold">Take Attendance</h2>
 
-      {/* Filters */}
+      {/* Filters Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow">
 
+        {/* Class Dropdown */}
         <select
+          className="border p-2 rounded"
           value={classId}
           onChange={(e) => setClassId(e.target.value)}
         >
           <option value="">Select Class</option>
-          {classes.map((item) => (
-            <option key={item.class_id} value={item.class_id}>
-              {item.class_name}
+          {classes.map((cls) => (
+            <option key={cls.id} value={cls.id}>
+              {cls.name}
             </option>
           ))}
         </select>
 
+        {/* Section Dropdown */}
         <select
           className="border p-2 rounded"
           value={section}
@@ -138,21 +142,21 @@ const TakeAttendance = () => {
           <option value="C">C</option>
         </select>
 
+        {/* Subject Dropdown */}
         <select
+          className="border p-2 rounded"
           value={subjectId}
           onChange={(e) => setSubjectId(e.target.value)}
         >
           <option value="">Select Subject</option>
-          {subjects
-            .filter(s => s.class_id == classId)   // 🔥 Important
-            .map((item) => (
-              <option key={item.subject_id} value={item.subject_id}>
-                {item.subject_name}
-              </option>
-            ))}
+          {subjects.map((sub) => (
+            <option key={sub.id} value={sub.id}>
+              {sub.name}
+            </option>
+          ))}
         </select>
 
-
+        {/* Date Picker */}
         <input
           type="date"
           className="border p-2 rounded"
@@ -161,6 +165,7 @@ const TakeAttendance = () => {
         />
       </div>
 
+      {/* Fetch Students Button */}
       <button
         onClick={fetchStudents}
         className="bg-blue-600 text-white px-4 py-2 rounded"
@@ -168,9 +173,10 @@ const TakeAttendance = () => {
         Fetch Students
       </button>
 
-      {/* Student List */}
+      {/* Loading Indicator */}
       {loading && <p>Loading...</p>}
 
+      {/* Student List */}
       {students.length > 0 && (
         <div className="bg-white p-4 rounded-xl shadow">
           <table className="w-full border">
@@ -184,7 +190,9 @@ const TakeAttendance = () => {
             <tbody>
               {students.map((student) => (
                 <tr key={student.id}>
-                  <td className="border p-2">{student.roll_no}</td>
+                  <td className="border p-2">
+                    {student.roll_no || student.student_id}
+                  </td>
                   <td className="border p-2">{student.name}</td>
                   <td className="border p-2 text-center">
                     <input

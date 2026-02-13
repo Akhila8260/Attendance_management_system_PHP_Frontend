@@ -25,6 +25,7 @@ const Students = () => {
     email: "",
     mobile: "",
     class_id: "",
+    section: "", // ✅ Added
   });
 
   // ================= FETCH STUDENTS =================
@@ -105,6 +106,9 @@ const Students = () => {
     if (form.mobile && !/^[6-9]\d{9}$/.test(form.mobile))
       errors.push("Valid 10 digit mobile number required");
 
+    if (!form.section)
+      errors.push("Section is required"); // ✅ Added validation
+
     return errors;
   };
 
@@ -144,6 +148,7 @@ const Students = () => {
         email: "",
         mobile: "",
         class_id: "",
+        section: "", // ✅ Reset section
       });
 
       fetchStudents();
@@ -218,6 +223,7 @@ const Students = () => {
                   <th className="p-3">Email</th>
                   <th className="p-3">Mobile</th>
                   <th className="p-3">Class</th>
+                  <th className="p-3">Section</th>
                   <th className="p-3">Status</th>
                   <th className="p-3">Actions</th>
                 </tr>
@@ -238,6 +244,9 @@ const Students = () => {
                     <td className="p-3">{student.mobile}</td>
                     <td className="p-3">
                       {student.class?.name || "N/A"}
+                    </td>
+                    <td className="p-3">
+                      {student.section || "N/A"}
                     </td>
                     <td className="p-3">
                       <span
@@ -349,6 +358,20 @@ const Students = () => {
                 {cls.name}
               </option>
             ))}
+          </select>
+
+          {/* ✅ Section Dropdown */}
+          <select
+            className="w-full border px-4 py-2 rounded-lg"
+            value={form.section}
+            onChange={(e) =>
+              setForm({ ...form, section: e.target.value })
+            }
+          >
+            <option value="">Select Section</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
           </select>
 
           <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg w-full">
